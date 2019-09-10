@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +21,7 @@ import java.util.List;
 import id.co.muf.okta.academy.R;
 import id.co.muf.okta.academy.data.CourseEntity;
 import id.co.muf.okta.academy.utils.DataDummy;
+import id.co.muf.okta.academy.viewmodel.ViewModelFactory;
 
 
 /**
@@ -60,14 +62,27 @@ public class AcademyFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (getActivity() != null) {
-            viewModel = ViewModelProviders.of(this).get(AcademyViewModel.class);
-            courses = viewModel.getCourses();
+            progressBar.setVisibility(View.VISIBLE);
+            viewModel = obtainViewModel(getActivity());
+//            courses = viewModel.getCourses();
             academyAdapter = new AcademyAdapter(getActivity());
+            viewModel.getCourses().observe(this, courses -> {
+                progressBar.setVisibility(View.GONE);
+                academyAdapter.setListCourses(courses);
+                academyAdapter.notifyDataSetChanged();
+            });
             academyAdapter.setListCourses(courses);
             rvCourse.setLayoutManager(new LinearLayoutManager(getContext()));
             rvCourse.setHasFixedSize(true);
             rvCourse.setAdapter(academyAdapter);
         }
+    }
+
+    @NonNull
+    private static AcademyViewModel obtainViewModel(FragmentActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+        return ViewModelProviders.of(activity, factory).get(AcademyViewModel.class);
     }
 
 }

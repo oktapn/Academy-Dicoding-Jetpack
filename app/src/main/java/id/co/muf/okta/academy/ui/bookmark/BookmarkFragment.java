@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,7 @@ import java.util.List;
 import id.co.muf.okta.academy.R;
 import id.co.muf.okta.academy.data.CourseEntity;
 import id.co.muf.okta.academy.utils.DataDummy;
+import id.co.muf.okta.academy.viewmodel.ViewModelFactory;
 
 
 /**
@@ -75,17 +77,29 @@ public class BookmarkFragment extends Fragment implements BookmarkFragmentCallba
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (getActivity() != null) {
-
-            viewModel = ViewModelProviders.of(this).get(BookmarkViewModel.class);
-            courses = viewModel.getBookmarks();
+            progressBar.setVisibility(View.VISIBLE);
+            viewModel = obtainViewModel(getActivity());
+//            courses = viewModel.getBookmarks();
 
             adapter = new BookmarkAdapter(getActivity(), this);
+            viewModel.getBookmarks().observe(this, courses -> {
+                progressBar.setVisibility(View.GONE);
+                adapter.setListCourses(courses);
+                adapter.notifyDataSetChanged();
+            });
             adapter.setListCourses(courses);
 
             rvBookmark.setLayoutManager(new LinearLayoutManager(getContext()));
             rvBookmark.setHasFixedSize(true);
             rvBookmark.setAdapter(adapter);
         }
+    }
+
+    @NonNull
+    private static BookmarkViewModel obtainViewModel(FragmentActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+        return ViewModelProviders.of(activity, factory).get(BookmarkViewModel.class);
     }
 
 }

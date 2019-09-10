@@ -7,6 +7,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProviders;
@@ -28,6 +29,7 @@ import id.co.muf.okta.academy.data.ModuleEntity;
 import id.co.muf.okta.academy.ui.reader.CourseReaderActivity;
 import id.co.muf.okta.academy.utils.DataDummy;
 import id.co.muf.okta.academy.utils.GlideApp;
+import id.co.muf.okta.academy.viewmodel.ViewModelFactory;
 
 public class DetailCourseActivity extends AppCompatActivity {
 
@@ -48,7 +50,7 @@ public class DetailCourseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_course);
-        viewModel = ViewModelProviders.of(this).get(DetailCourseViewModel.class);
+        viewModel = obtainViewModel(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
@@ -70,14 +72,27 @@ public class DetailCourseActivity extends AppCompatActivity {
             String courseId = extras.getString(EXTRA_COURSE);
             if (courseId != null) {
                 viewModel.setCourseId(courseId);
-                modules = viewModel.getModules();
+                progressBar.setVisibility(View.VISIBLE);
+//                modules = viewModel.getModules();
                 adapter.setModules(modules);
             }
         }
 
-        if (viewModel.getCourse() != null) {
-            populateCourse(viewModel.getCourse());
-        }
+        viewModel.getModules().observe(this, moduleEntities -> {
+            progressBar.setVisibility(View.GONE);
+            adapter.setModules(moduleEntities);
+            adapter.notifyDataSetChanged();
+        });
+
+        viewModel.getCourse().observe(this, courseEntity -> {
+            if (courseEntity != null) {
+                populateCourse(courseEntity);
+            }
+        });
+
+//        if (viewModel.getCourse() != null) {
+//            populateCourse(viewModel.getCourse());
+//        }
 
         rvModule.setNestedScrollingEnabled(false);
         rvModule.setLayoutManager(new LinearLayoutManager(this));
@@ -103,5 +118,13 @@ public class DetailCourseActivity extends AppCompatActivity {
             intent.putExtra(CourseReaderActivity.EXTRA_COURSE_ID, viewModel.getCourseId());
             v.getContext().startActivity(intent);
         });
+    }
+
+    @NonNull
+    private static DetailCourseViewModel obtainViewModel(AppCompatActivity activity) {
+        // Use a Factory to inject dependencies into the ViewModel
+        ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
+
+        return ViewModelProviders.of(activity, factory).get(DetailCourseViewModel.class);
     }
 }

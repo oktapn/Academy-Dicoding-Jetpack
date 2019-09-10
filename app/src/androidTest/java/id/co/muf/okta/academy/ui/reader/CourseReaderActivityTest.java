@@ -3,15 +3,19 @@ package id.co.muf.okta.academy.ui.reader;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import id.co.muf.okta.academy.R;
 import id.co.muf.okta.academy.data.CourseEntity;
+import id.co.muf.okta.academy.utils.EspressoIdlingResource;
 import id.co.muf.okta.academy.utils.FakeDataDummy;
 import id.co.muf.okta.academy.utils.RecyclerViewItemCountAssertion;
 
@@ -37,15 +41,23 @@ public class CourseReaderActivityTest {
         }
     };
 
+    @Before
+    public void setUp() {
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.getEspressoIdlingResource());
+    }
+
+    @After
+    public void tearDown() {
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.getEspressoIdlingResource());
+    }
+
     @Test
     public void loadModules() {
-        onView(withId(R.id.rv_module)).check(matches(isDisplayed()));
         onView(withId(R.id.rv_module)).check(new RecyclerViewItemCountAssertion(7));
     }
 
     @Test
     public void clickModule() {
-        onView(withId(R.id.rv_module)).check(matches(isDisplayed()));
         onView(withId(R.id.rv_module)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
 
         onView(withId(R.id.web_view)).check(matches(isDisplayed()));

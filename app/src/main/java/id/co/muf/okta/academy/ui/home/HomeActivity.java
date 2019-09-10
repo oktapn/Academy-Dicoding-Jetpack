@@ -1,4 +1,4 @@
-package id.co.muf.okta.academy.ui.reader.home;
+package id.co.muf.okta.academy.ui.home;
 
 import android.os.Bundle;
 
