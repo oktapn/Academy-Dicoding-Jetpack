@@ -17,15 +17,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.util.List;
 
 import id.co.muf.okta.academy.R;
-import id.co.muf.okta.academy.data.ModuleEntity;
+import id.co.muf.okta.academy.data.source.local.entity.ModuleEntity;
 import id.co.muf.okta.academy.ui.reader.CourseReaderActivity;
 import id.co.muf.okta.academy.ui.reader.CourseReaderCallback;
 import id.co.muf.okta.academy.ui.reader.CourseReaderViewModel;
-import id.co.muf.okta.academy.utils.DataDummy;
 import id.co.muf.okta.academy.viewmodel.ViewModelFactory;
 
 
@@ -73,10 +73,21 @@ public class ModuleListFragment extends Fragment implements MyAdapterClickListen
             viewModel = obtainViewModel(getActivity());
             adapter = new ModuleListAdapter(this);
 //            populateRecyclerView(viewModel.getModules());
-            viewModel.getModules().observe(this, moduleEntities -> {
-                if (moduleEntities!=null){
-                    progressBar.setVisibility(View.GONE);
-                    populateRecyclerView(moduleEntities);
+            viewModel.modules.observe(this, moduleEntities -> {
+                if (moduleEntities != null) {
+                    switch (moduleEntities.status) {
+                        case LOADING:
+                            progressBar.setVisibility(View.VISIBLE);
+                            break;
+                        case SUCCESS:
+                            progressBar.setVisibility(View.GONE);
+                            populateRecyclerView(moduleEntities.data);
+                            break;
+                        case ERROR:
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Terjadi kesalahan", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
                 }
             });
         }

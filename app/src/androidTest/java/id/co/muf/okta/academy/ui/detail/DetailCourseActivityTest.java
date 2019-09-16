@@ -13,14 +13,13 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import id.co.muf.okta.academy.R;
-import id.co.muf.okta.academy.data.CourseEntity;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
 import id.co.muf.okta.academy.utils.EspressoIdlingResource;
 import id.co.muf.okta.academy.utils.FakeDataDummy;
 import id.co.muf.okta.academy.utils.RecyclerViewItemCountAssertion;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 

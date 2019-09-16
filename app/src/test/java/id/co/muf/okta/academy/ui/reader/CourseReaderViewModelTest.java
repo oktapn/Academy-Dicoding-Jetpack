@@ -11,13 +11,13 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import id.co.muf.okta.academy.data.ContentEntity;
-import id.co.muf.okta.academy.data.CourseEntity;
-import id.co.muf.okta.academy.data.ModuleEntity;
+import id.co.muf.okta.academy.data.source.local.entity.ContentEntity;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
+import id.co.muf.okta.academy.data.source.local.entity.ModuleEntity;
 import id.co.muf.okta.academy.data.source.AcademyRepository;
 import id.co.muf.okta.academy.utils.FakeDataDummy;
+import id.co.muf.okta.academy.vo.Resource;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -64,15 +64,27 @@ public class CourseReaderViewModelTest {
 //        assertEquals(7, moduleEntities.size());
 
         //versi3
-        MutableLiveData<List<ModuleEntity>> moduleEntities = new MutableLiveData<>();
-        moduleEntities.setValue(dummyModules);
+//        MutableLiveData<List<ModuleEntity>> moduleEntities = new MutableLiveData<>();
+//        moduleEntities.setValue(dummyModules);
+//
+//        when(academyRepository.getAllModulesByCourse(courseId)).thenReturn(moduleEntities);
+//
+//        Observer<List<ModuleEntity>> observer = mock(Observer.class);
+//        viewModel.getModules().observeForever(observer);
+//
+//        verify(observer).onChanged(dummyModules);
+
+        //versi4
+        MutableLiveData<Resource<List<ModuleEntity>>> moduleEntities = new MutableLiveData<>();
+        Resource<List<ModuleEntity>> resource = Resource.success(dummyModules);
+        moduleEntities.setValue(resource);
 
         when(academyRepository.getAllModulesByCourse(courseId)).thenReturn(moduleEntities);
 
-        Observer<List<ModuleEntity>> observer = mock(Observer.class);
-        viewModel.getModules().observeForever(observer);
+        Observer<Resource<List<ModuleEntity>>> observer = mock(Observer.class);
+        viewModel.modules.observeForever(observer);
 
-        verify(observer).onChanged(dummyModules);
+        verify(observer).onChanged(resource);
     }
 
     @Test
@@ -106,23 +118,40 @@ public class CourseReaderViewModelTest {
 //        assertEquals(content, resultContent);
 
         //versi3
-        MutableLiveData<ModuleEntity> moduleEntity = new MutableLiveData<>();
+//        MutableLiveData<ModuleEntity> moduleEntity = new MutableLiveData<>();
+//
+//        ModuleEntity dummyModule = dummyModules.get(0);
+//        String content = "<h3 class=\"fr-text-bordered\">Modul 0 : Introduction</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";
+//        dummyModule.contentEntity = new ContentEntity(content);
+//
+//        moduleEntity.setValue(dummyModule);
+//
+//        when(academyRepository.getContent(courseId, moduleId)).thenReturn(moduleEntity);
+//
+//        viewModel.setSelectedModule(moduleId);
+//
+//        Observer<ModuleEntity> observer = mock(Observer.class);
+//
+//        viewModel.getSelectedModule().observeForever(observer);
+//
+//        verify(observer).onChanged(dummyModule);
+
+        //versi4
+        MutableLiveData<Resource<ModuleEntity>> moduleEntity = new MutableLiveData<>();
 
         ModuleEntity dummyModule = dummyModules.get(0);
         String content = "<h3 class=\"fr-text-bordered\">Modul 0 : Introduction</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>";
         dummyModule.contentEntity = new ContentEntity(content);
+        Resource<ModuleEntity> resource = Resource.success(dummyModule);
+        moduleEntity.setValue(resource);
 
-        moduleEntity.setValue(dummyModule);
-
-        when(academyRepository.getContent(courseId, moduleId)).thenReturn(moduleEntity);
+        when(academyRepository.getContent(moduleId)).thenReturn(moduleEntity);
 
         viewModel.setSelectedModule(moduleId);
 
-        Observer<ModuleEntity> observer = mock(Observer.class);
-
-        viewModel.getSelectedModule().observeForever(observer);
-
-        verify(observer).onChanged(dummyModule);
+        Observer<Resource<ModuleEntity>> observer = mock(Observer.class);
+        viewModel.selectedModule.observeForever(observer);
+        verify(observer).onChanged(resource);
     }
 
 }

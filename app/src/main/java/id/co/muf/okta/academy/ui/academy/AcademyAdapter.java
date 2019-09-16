@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import id.co.muf.okta.academy.R;
-import id.co.muf.okta.academy.data.CourseEntity;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
 import id.co.muf.okta.academy.ui.detail.DetailCourseActivity;
 import id.co.muf.okta.academy.utils.GlideApp;
 

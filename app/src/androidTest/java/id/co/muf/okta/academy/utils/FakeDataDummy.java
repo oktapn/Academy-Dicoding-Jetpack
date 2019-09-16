@@ -2,8 +2,8 @@ package id.co.muf.okta.academy.utils;
 
 import java.util.ArrayList;
 
-import id.co.muf.okta.academy.data.CourseEntity;
-import id.co.muf.okta.academy.data.ModuleEntity;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
+import id.co.muf.okta.academy.data.source.local.entity.ModuleEntity;
 
 public class FakeDataDummy {
     public static ArrayList<CourseEntity> generateDummyCourses() {

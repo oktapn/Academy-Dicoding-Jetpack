@@ -3,6 +3,7 @@ package id.co.muf.okta.academy.ui.bookmark;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.paging.PagedList;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,11 +12,11 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import id.co.muf.okta.academy.data.CourseEntity;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
 import id.co.muf.okta.academy.data.source.AcademyRepository;
 import id.co.muf.okta.academy.utils.FakeDataDummy;
+import id.co.muf.okta.academy.vo.Resource;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,18 +50,45 @@ public class BookmarkViewModelTest {
 //        assertEquals(5, courseEntities.size());
 
         //versi3
-        ArrayList<CourseEntity> dummyCourses = FakeDataDummy.generateDummyCourses();
+//        ArrayList<CourseEntity> dummyCourses = FakeDataDummy.generateDummyCourses();
+//
+//        MutableLiveData<List<CourseEntity>> courses = new MutableLiveData<>();
+//        courses.setValue(dummyCourses);
+//
+//        when(academyRepository.getBookmarkedCourses()).thenReturn(courses);
+//
+//        Observer<List<CourseEntity>> observer = mock(Observer.class);
+//
+//        viewModel.getBookmarks().observeForever(observer);
+//
+//        verify(observer).onChanged(dummyCourses);
 
-        MutableLiveData<List<CourseEntity>> courses = new MutableLiveData<>();
-        courses.setValue(dummyCourses);
+        //versi4
+//        Resource<List<CourseEntity>> resource = Resource.success(FakeDataDummy.generateDummyCourses());
+//        MutableLiveData<Resource<List<CourseEntity>>> dummyCourses = new MutableLiveData<>();
+//        dummyCourses.setValue(resource);
+//
+//        when(academyRepository.getBookmarkedCourses()).thenReturn(dummyCourses);
+//
+//        Observer<Resource<List<CourseEntity>>> observer = mock(Observer.class);
+//
+//        viewModel.getBookmarks().observeForever(observer);
+//
+//        verify(observer).onChanged(resource);
 
-        when(academyRepository.getBookmarkedCourses()).thenReturn(courses);
+        //versi5
+        MutableLiveData<Resource<PagedList<CourseEntity>>> dummyCourse = new MutableLiveData<>();
+        PagedList<CourseEntity> pagedList = mock(PagedList.class);
 
-        Observer<List<CourseEntity>> observer = mock(Observer.class);
+        dummyCourse.setValue(Resource.success(pagedList));
 
-        viewModel.getBookmarks().observeForever(observer);
+        when(academyRepository.getBookmarkedCoursesPaged()).thenReturn(dummyCourse);
 
-        verify(observer).onChanged(dummyCourses);
+        Observer<Resource<PagedList<CourseEntity>>> observer = mock(Observer.class);
+
+        viewModel.getBookmarksPaged().observeForever(observer);
+
+        verify(observer).onChanged(Resource.success(pagedList));
     }
 
 }

@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import id.co.muf.okta.academy.R;
-import id.co.muf.okta.academy.data.ModuleEntity;
+import id.co.muf.okta.academy.data.source.local.entity.ModuleEntity;
 
 public class DetailCourseAdapter extends RecyclerView.Adapter<DetailCourseAdapter.ModuleViewHolder> {
 

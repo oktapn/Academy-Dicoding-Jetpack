@@ -9,6 +9,7 @@ import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,12 +17,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
 import id.co.muf.okta.academy.R;
-import id.co.muf.okta.academy.data.CourseEntity;
-import id.co.muf.okta.academy.utils.DataDummy;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
 import id.co.muf.okta.academy.viewmodel.ViewModelFactory;
 
 
@@ -31,7 +34,7 @@ import id.co.muf.okta.academy.viewmodel.ViewModelFactory;
 public class BookmarkFragment extends Fragment implements BookmarkFragmentCallback {
 
 
-    private BookmarkAdapter adapter;
+    private BookmarkPagedAdapter adapter;
     private RecyclerView rvBookmark;
     private ProgressBar progressBar;
     private BookmarkViewModel viewModel;
@@ -81,17 +84,33 @@ public class BookmarkFragment extends Fragment implements BookmarkFragmentCallba
             viewModel = obtainViewModel(getActivity());
 //            courses = viewModel.getBookmarks();
 
-            adapter = new BookmarkAdapter(getActivity(), this);
-            viewModel.getBookmarks().observe(this, courses -> {
-                progressBar.setVisibility(View.GONE);
-                adapter.setListCourses(courses);
-                adapter.notifyDataSetChanged();
+            adapter = new BookmarkPagedAdapter(this);
+
+            viewModel.getBookmarksPaged().observe(this, courses -> {
+                if (courses != null) {
+                    switch (courses.status) {
+                        case LOADING:
+                            progressBar.setVisibility(View.VISIBLE);
+                            break;
+                        case SUCCESS:
+                            progressBar.setVisibility(View.GONE);
+                            adapter.submitList(courses.data);
+                            adapter.notifyDataSetChanged();
+                            break;
+                        case ERROR:
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getContext(), "Terjadi kesalahan", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                }
+
             });
-            adapter.setListCourses(courses);
 
             rvBookmark.setLayoutManager(new LinearLayoutManager(getContext()));
             rvBookmark.setHasFixedSize(true);
             rvBookmark.setAdapter(adapter);
+            itemTouchHelper.attachToRecyclerView(rvBookmark);
+
         }
     }
 
@@ -101,5 +120,29 @@ public class BookmarkFragment extends Fragment implements BookmarkFragmentCallba
         ViewModelFactory factory = ViewModelFactory.getInstance(activity.getApplication());
         return ViewModelProviders.of(activity, factory).get(BookmarkViewModel.class);
     }
+
+    private ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.Callback() {
+        @Override
+        public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        }
+
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return true;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            if (getView() != null) {
+                int swipedPosition = viewHolder.getAdapterPosition();
+                CourseEntity courseEntity = adapter.getItemById(swipedPosition);
+                viewModel.setBookmark(courseEntity);
+                Snackbar snackbar = Snackbar.make(getView(), R.string.message_undo, Snackbar.LENGTH_LONG);
+                snackbar.setAction(R.string.message_ok, v -> viewModel.setBookmark(courseEntity));
+                snackbar.show();
+            }
+        }
+    });
 
 }

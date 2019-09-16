@@ -1,6 +1,10 @@
-package id.co.muf.okta.academy.data;
+package id.co.muf.okta.academy.data.source.local.entity;
+
+import androidx.room.ColumnInfo;
 
 public class ContentEntity {
+
+    @ColumnInfo(name = "content")
     private String mContent;
 
     public ContentEntity(String content) {

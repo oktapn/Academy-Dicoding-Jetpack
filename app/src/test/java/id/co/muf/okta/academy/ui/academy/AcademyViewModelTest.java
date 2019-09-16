@@ -11,11 +11,11 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import id.co.muf.okta.academy.data.CourseEntity;
+import id.co.muf.okta.academy.data.source.local.entity.CourseEntity;
 import id.co.muf.okta.academy.data.source.AcademyRepository;
 import id.co.muf.okta.academy.utils.FakeDataDummy;
+import id.co.muf.okta.academy.vo.Resource;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +27,7 @@ public class AcademyViewModelTest {
 
     private AcademyViewModel viewModel;
     private AcademyRepository academyRepository = mock(AcademyRepository.class);
+    private String USERNAME = "Dicoding";
 
     @Before
     public void setUp() {
@@ -48,18 +49,34 @@ public class AcademyViewModelTest {
 //        assertEquals(5, courseEntities.size());
 
         //versi3
-        ArrayList<CourseEntity> dummyCourses = FakeDataDummy.generateDummyCourses();
+//        ArrayList<CourseEntity> dummyCourses = FakeDataDummy.generateDummyCourses();
+//
+//        MutableLiveData<List<CourseEntity>> courses = new MutableLiveData<>();
+//        courses.setValue(dummyCourses);
+//
+//        when(academyRepository.getAllCourses()).thenReturn(courses);
+//
+//        Observer<List<CourseEntity>> observer = mock(Observer.class);
+//
+//        viewModel.getCourses().observeForever(observer);
+//
+//        verify(observer).onChanged(dummyCourses);
 
-        MutableLiveData<List<CourseEntity>> courses = new MutableLiveData<>();
-        courses.setValue(dummyCourses);
+        //versi4
+        Resource<List<CourseEntity>> resource = Resource.success(FakeDataDummy.generateDummyCourses());
+        MutableLiveData<Resource<List<CourseEntity>>> dummyCourses = new MutableLiveData<>();
+        dummyCourses.setValue(resource);
 
-        when(academyRepository.getAllCourses()).thenReturn(courses);
+        when(academyRepository.getAllCourses()).thenReturn(dummyCourses);
 
-        Observer<List<CourseEntity>> observer = mock(Observer.class);
+        Observer<Resource<List<CourseEntity>>> observer = mock(Observer.class);
 
-        viewModel.getCourses().observeForever(observer);
+        viewModel.setUsername(USERNAME);
 
-        verify(observer).onChanged(dummyCourses);
+        viewModel.courses.observeForever(observer);
+
+        verify(observer).onChanged(resource);
+
     }
 
 }
